@@ -321,9 +321,23 @@ copy-output-files:
     - mkdir -p {{ .WORKING_OUTPUT_PATH }}
     - cp -R {{ .KALDI_OUTPUT_PATH }}/kaldi/data/infer/* {{ .WORKING_OUTPUT_PATH }}
 
+transcribe-prepare:
+  dir: /kaldi-helpers/working_dir
+  cmds:
+    - mkdir -p input/infer/tmp
+    - python3.6 {{ .INPUT_SCRIPTS_PATH }}/elan_to_json.py
+      --input_dir ./input/infer
+      --output_dir ./input/infer/tmp/dirty.json
+      --tier {{ .TARGET_LANGUAGE_TIER }}
+      --output_json input/infer
+    - python3.6 {{ .INPUT_SCRIPTS_PATH }}/json_to_kaldi.py
+      --input_json input/infer/tmp/{{ .CLEANED_FILTERED_DATA }}
+      --output_folder {{ .KALDI_OUTPUT_PATH }}/tmp/json_splitted
+
 _transcribe:
   dir: /kaldi-helpers
   cmds:
+   - task transcribe-prepare
    - cp -R working_dir/input/infer {{ .KALDI_OUTPUT_PATH }}/kaldi/data/infer
    - task infer
    - task copy-output-files
@@ -331,6 +345,7 @@ _transcribe:
 _transcribe-align:
   dir: /kaldi-helpers
   cmds:
+    - task transcripe-prepare
     - cp -R working_dir/input/infer {{ .KALDI_OUTPUT_PATH }}/kaldi/data/infer
     - task infer-align
     - task copy-output-files

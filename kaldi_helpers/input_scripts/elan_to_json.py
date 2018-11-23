@@ -44,8 +44,14 @@ def process_eaf(input_elan_file: str, tier_name: str) -> List[dict]:
         raise ValueError(f"WAV file not found for {full_file_name}. "
                          f"Please put it next to the eaf file in {input_directory}.")
 
+    # Get first tier by default if not provided or not valid
+    if not tier_name or tier_name not in input_eaf.get_tier_names():
+        print("No tier provided or tier name invalid")
+        tier_name = input_eaf.get_tier_names()[0]
+
     # Get annotations and parameters (things like speaker id) on the target tier
     annotations = sorted(input_eaf.get_annotation_data_for_tier(tier_name))
+
     parameters = input_eaf.get_parameters_for_tier(tier_name)
     speaker_id = parameters.get("PARTICIPANT", "")
 
@@ -90,8 +96,7 @@ def main():
                         help="Output directory",
                         default="../input/output/tmp/")
     parser.add_argument("-t", "--tier",
-                        help="Target language tier name",
-                        default="Phrase")
+                        help="Target language tier name")
     parser.add_argument("-j", "--output_json",
                         help="File name to output_scripts json")
     arguments: argparse.Namespace = parser.parse_args()
@@ -101,11 +106,11 @@ def main():
         os.makedirs(arguments.output_dir)
 
     all_files_in_directory = set(glob.glob(os.path.join(arguments.input_dir, "**"), recursive=True))
-    input_eafs_files = find_files_by_extension(all_files_in_directory, {"*.eaf"})
+    input_eaf_files = find_files_by_extension(all_files_in_directory, {"*.eaf"})
 
     annotations_data = []
 
-    for input_eaf_file in input_eafs_files:
+    for input_eaf_file in input_eaf_files:
         annotations_data.extend(process_eaf(input_eaf_file, arguments.tier))
 
     write_data_to_json_file(annotations_data, arguments.output_json)

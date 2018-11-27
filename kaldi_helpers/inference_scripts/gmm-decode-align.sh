@@ -31,7 +31,6 @@
 #    exp/
 #        tri/
 #            final.mdl  <= all copied verbatim from pre-trained triphone model
-#
 #            graph/
 #                HCLG.fst
 #                words.txt
@@ -50,21 +49,12 @@
 #            utterance-0.eaf
 
 
-
-. ./path.sh
 # make sure you include the path to the gmm bin(s)
-# the following two export commands are what my path.sh script contains:
-# export PATH=$PWD/utils/:$PWD/../../../src/bin:$PWD/../../../tools/openfst/bin:$PWD/../../../src/fstbin/:$PWD/../../../src/gmmbin/:$PWD/../../../src/featbin/:$PWD/../../../src/lm/:$PWD/../../../src/sgmmbin/:$PWD/../../../src/fgmmbin/:$PWD/../../../src/latbin/:$PWD/../../../src/nnet2bin/:$PWD:$PATH
-# export LC_ALL=C
-
-# CREATE REQUIRED DIRECTORIES
-# mkdir ./data/infer
+. ./path.sh
 
 # COPY TRAINED MODEL
 echo "==== Copying Pretrained Model ===="
 cp -R ./exp/tri1 ./exp/tri
-# cp ./data/test/* ./data/infer
-# rm ./data/infer/text
 
 # CREATE MFCC (mel-frequency cepstral coefficients)
 # args:

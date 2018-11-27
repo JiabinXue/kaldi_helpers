@@ -1,10 +1,12 @@
 #!/usr/bin/python3
-#
-# Copyright Ben Foley ben@cbmm.io 30 Jan 2018
-#
-# Split Elan .eaf and .wav audio file by the start and end times of annotations on a particular tier
-# Don't worry about 'Parsing unknown version of ELAN spec... ' warnings,
-# pympi is looking for v 2.7 or 2.8 of elan schema
+
+"""
+Copyright Ben Foley ben@cbmm.io 30 Jan 2018
+
+Split Elan .eaf and .wav audio file by the start and end times of annotations on a particular tier
+Don't worry about 'Parsing unknown version of ELAN spec... ' warnings,
+pympi is looking for v 2.7 or 2.8 of elan schema
+"""
 
 
 import argparse
@@ -16,9 +18,9 @@ from pydub import AudioSegment
 from pympi.Elan import Eaf
 
 
-def split_audio_by_start_end(input_audio, start, end, fname, ext, output_audio_dir):
+def split_audio_by_start_end(input_audio, start, end, file_name, extension, output_audio_dir):
     output = input_audio[start:end]
-    output.export(os.path.join(output_audio_dir, fname + ext), format=ext[1:])
+    output.export(os.path.join(output_audio_dir, file_name + extension), format=extension[1:])
 
 
 def write_text(annotation, fname, ext, output_text_dir):
@@ -64,14 +66,14 @@ def read_eaf(ie, tier, silence_tier, silence_marker, json_data, output_text_dir,
         speaker_id = params['PARTICIPANT']
 
     i = 0
-    for ann in annotations:
+    for annotation in annotations:
         skip = False
-        start = ann[0]
-        end = ann[1]
+        start = annotation[0]
+        end = annotation[1]
         # output_scripts new values, not the original clip start end times
         clip_start = 0
-        clip_end = ann[1] - ann[0]
-        annotation = ann[2]
+        clip_end = annotation[1] - annotation[0]
+        annotation = annotation[2]
 
         # Check for annotations labelled with a particular symbol on the main tier
         if annotation == silence_marker:
@@ -89,9 +91,9 @@ def read_eaf(ie, tier, silence_tier, silence_marker, json_data, output_text_dir,
             print("processing" + str(i))
             # print('processing annotation: ' + annotation, start, end)
             # build the output_scripts audio/text filename
-            fname = basename + "_" + str(i)
+            file_name = basename + "_" + str(i)
             obj = {
-                'audioFileName': os.path.join(".", fname + ".wav"),
+                'audioFileName': os.path.join(".", file_name + ".wav"),
                 'transcript': annotation,
                 'startMs': clip_start,
                 'stopMs': clip_end
@@ -99,8 +101,8 @@ def read_eaf(ie, tier, silence_tier, silence_marker, json_data, output_text_dir,
             if 'PARTICIPANT' in params:
                 obj["speakerId"] = speaker_id
             json_data.append(obj)
-            split_audio_by_start_end(input_audio, start, end, fname, ".wav", output_audio_dir)
-            write_text(annotation, fname, ".txt", output_text_dir)
+            split_audio_by_start_end(input_audio, start, end, file_name, ".wav", output_audio_dir)
+            write_text(annotation, file_name, ".txt", output_text_dir)
             i += 1
 
 

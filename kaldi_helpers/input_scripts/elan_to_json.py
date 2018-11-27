@@ -37,6 +37,12 @@ def process_eaf(input_elan_file: str, tier_name: str) -> List[dict]:
 
     input_eaf = Eaf(input_elan_file)
 
+    # Default to first tier if given tier not found.
+    tier_names = input_eaf.get_tier_names()
+    if tier_name not in tier_names:
+        print("WARNING: Provided tier not found, defaulting to first tier")
+        tier_name = tier_names[0]
+
     # Look for wav file matching the eaf file in same directory
     if os.path.isfile(os.path.join(input_directory, file_name + ".wav")):
         print("WAV file found for " + file_name, file=sys.stderr)

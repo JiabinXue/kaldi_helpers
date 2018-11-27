@@ -85,5 +85,6 @@ def main() -> None:
     output_json = os.path.join(result_base_name, outfile_name)
     write_data_to_json_file(intervals, output_json)
 
+
 if __name__ == "__main__":
     main()
